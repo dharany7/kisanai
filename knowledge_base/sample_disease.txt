@@ -1,0 +1,21 @@
+DISEASE: Early Blight
+CROP: Tomato
+SYMPTOMS: Yellow-brown spots with concentric rings on lower/older leaves; spots eventually turn dark brown; affected leaves wither and drop.
+TREATMENT: Spray Mancozeb 2.5g per litre of water every 7-10 days. Remove and destroy infected leaves. Apply Copper Oxychloride 3g/litre as an alternative.
+PREVENTION: Avoid overhead irrigation; water plants at the base. Maintain proper plant spacing for air circulation. Practice crop rotation — avoid planting tomatoes in the same plot for at least 2 years.
+
+---
+
+DISEASE: Powdery Mildew
+CROP: Wheat
+SYMPTOMS: White to grey powdery fungal growth on upper leaf surfaces and stems; infected tissue turns yellow, then brown; severely affected plants show stunted growth and reduced grain fill.
+TREATMENT: Spray Propiconazole (Tilt 25 EC) at 1ml per litre of water at the first sign of infection. Repeat after 15 days if the disease persists. Sulphur dust (30kg/ha) is an effective low-cost option.
+PREVENTION: Plant resistant varieties such as HD 2967 or PBW 550. Avoid excessive nitrogen fertilisation, which promotes soft leaf tissue susceptible to infection. Ensure adequate plant spacing.
+
+---
+
+DISEASE: Bacterial Leaf Blight
+CROP: Rice
+SYMPTOMS: Water-soaked, pale green lesions along leaf margins that turn yellow then white-grey; lesions spread inward, causing large areas of dead tissue; milky or yellow bacterial ooze may be visible.
+TREATMENT: Drain the field immediately and avoid flood irrigation until recovery. Spray Streptomycin Sulphate + Tetracycline (Plantomycin) at 6g per 10 litres of water. Apply Copper Hydroxide 3g/litre as a follow-up.
+PREVENTION: Use certified disease-free seeds; treat seeds with Streptomycin 1g/litre before sowing. Avoid excessive nitrogen; split urea application into three doses. Remove and burn infected stubble after harvest.

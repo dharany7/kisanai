@@ -1,0 +1,35 @@
+# KisanAI — Python Dependencies
+# Install with: pip install -r requirements.txt
+
+# ── Web framework ─────────────────────────────────────────────────────────────
+fastapi==0.115.12
+uvicorn[standard]==0.34.3
+python-multipart==0.0.32   # Required for FastAPI form data parsing (Twilio webhooks)
+
+# ── Environment & config ──────────────────────────────────────────────────────
+python-dotenv==1.1.0
+
+# ── WhatsApp / Twilio messaging ───────────────────────────────────────────────
+twilio==9.6.4
+
+# ── LLM (Google Gemini) ───────────────────────────────────────────────────────
+google-genai==2.9.0             # Current Gemini SDK (replaces deprecated google-generativeai)
+
+# ── Vector database (knowledge base RAG) ─────────────────────────────────────
+chromadb==0.6.3
+sentence-transformers==4.1.0
+
+# ── Text-to-speech & audio conversion ────────────────────────────────────────
+gTTS==2.5.4
+# OGG conversion is done via ffmpeg subprocess (no Python package needed)
+# Install ffmpeg:  winget install Gyan.FFmpeg
+
+# ── HTTP client (async) ───────────────────────────────────────────────────────
+httpx==0.28.1
+
+# ── Image processing ─────────────────────────────────────────────────────────
+pillow==11.2.1
+
+# ── Testing ───────────────────────────────────────────────────────────────────
+pytest==8.4.0
+httpx==0.28.1   # also used as the AsyncClient backend for FastAPI TestClient

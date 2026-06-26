@@ -1,0 +1,7 @@
+Add-Content .gitignore ".env"
+Add-Content .gitignore "venv/"
+Add-Content .gitignore "__pycache__/"
+Add-Content .gitignore "*.pyc"
+Add-Content .gitignore "audio_replies/"
+Add-Content .gitignore ".pytest_cache/"
+Add-Content .gitignore "*.log"
