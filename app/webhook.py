@@ -17,9 +17,10 @@ from pathlib import Path
 from typing import Optional
 
 from dotenv import load_dotenv
-from fastapi import Form
+from fastapi import APIRouter, Form, Request
 from fastapi.responses import PlainTextResponse
 from twilio.rest import Client as TwilioClient
+router = APIRouter()
 
 from app.agent import get_farming_advice
 from app.vision import analyze_crop

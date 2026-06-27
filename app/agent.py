@@ -1,5 +1,5 @@
 """
-agent.py — AI advisory orchestrator via Google Gemini (Phase 3)
+agent.py — AI advisory orchestrator via Google Gemini (Phase 5 — RAG)
 
 Public interface:
     get_farming_advice(disease_result: dict) -> str
@@ -14,6 +14,8 @@ from google import genai
 from google.genai import types
 from dotenv import load_dotenv
 
+from app.rag import get_disease_context
+
 load_dotenv()
 
 logger = logging.getLogger(__name__)
@@ -21,7 +23,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # Gemini client — configured once at module load
 # ---------------------------------------------------------------------------
-_GEMINI_MODEL = "gemini-1.5-flash"
+_GEMINI_MODEL = "gemini-2.0-flash"
 
 def _get_client() -> genai.Client:
     """Create a Gemini client from the API key in .env."""
@@ -76,34 +78,46 @@ async def get_farming_advice(disease_result: dict) -> str:
         logger.info("🌿 Crop is healthy — returning canned reply")
         return _HEALTHY_REPLY
 
-    disease_name = disease_result.get("disease") or "Unknown disease"
-    probability = disease_result.get("probability", 0.0)
+    disease_name = disease_result.get("disease","Unknown disease")
+    probability = disease_result.get("probability", 0)
 
-    # Build the exact prompt
-    prompt = f"""You are KisanAI, an agricultural expert 
-for Indian farmers. Give specific advice.
+    # ── RAG: retrieve verified knowledge before calling Gemini ────────────
+    context = get_disease_context(disease_name)
+    context_block = context if context else "(No specific knowledge base entry found — use general expertise.)"
 
-Disease found: {disease_name}
-Confidence: {probability}%
+    # Build the RAG-enriched prompt
+    prompt = f"""You are KisanAI, an expert agricultural advisor 
+for Indian smallholder farmers in Tamil Nadu.
 
-Reply in this EXACT format, nothing else:
+{context_block}
 
-⚠️ DISEASE: {disease_name} (இலை நோய்)
+Disease detected by AI vision: {disease_name}
+Confidence level: {probability}%
+
+Using the verified knowledge above, give advice in this EXACT format:
+
+⚠️ DISEASE: [disease name] ([Tamil name if available])
 
 💊 TREATMENT:
-- Buy Mancozeb 75% WP or Copper Oxychloride from your local agri shop
-- Mix 2.5 grams per 1 litre of water
-- Spray on affected leaves every 7 days for 3 weeks
-- Spray early morning or evening, not in hot sun
+- [specific product name from knowledge base]
+- Dose: [exact amount]
+- Apply: [frequency and duration]
+
+🌿 ORGANIC OPTION:
+- [organic treatment from knowledge base]
 
 🛡️ PREVENTION:
-- Remove and burn infected leaves immediately
-- Do not water leaves from above, water only at roots
-- Keep space between plants for air circulation
+- [prevention tip 1 from knowledge base]
+- [prevention tip 2]
+
+⏰ BEST TIME: [best time to spray]
+💰 COST: [approximate cost in India]
 
 📞 Kisan Call Centre: 1800-180-1551
 
-உங்கள் பயிர் விரைவில் குணமாகும்! தைரியமாக இருங்கள்! 🌿"""
+[One encouraging sentence in Tamil]
+
+Keep advice simple. A farmer with no education must understand it."""
 
     logger.info("🤖 Calling Gemini (%s) for farming advice …", _GEMINI_MODEL)
 
@@ -122,15 +136,32 @@ Reply in this EXACT format, nothing else:
             advice = prefix + advice
     except Exception as e:
         logger.error(f"Gemini API error: {e}")
+        from knowledge_base.diseases import DISEASES
+        disease_name = disease_result.get("disease", "Unknown")
+        probability = disease_result.get("probability", 0)
+        disease_data = None
+        for d in DISEASES:
+            if disease_name.lower() in d["disease"].lower():
+                disease_data = d
+                break
+        if disease_data:
+            return (
+                f"⚠️ DISEASE: {disease_data['disease']}\n"
+                f"({disease_data['tamil_name']})\n"
+                f"Confidence: {probability}%\n\n"
+                f"💊 TREATMENT:\n"
+                f"• {disease_data['treatment']}\n\n"
+                f"🌿 ORGANIC OPTION:\n"
+                f"• {disease_data['organic_treatment']}\n\n"
+                f"🛡️ PREVENTION:\n"
+                f"• {disease_data['prevention']}\n\n"
+                f"⏰ BEST TIME: {disease_data['best_time_to_spray']}\n"
+                f"💰 COST: {disease_data['cost']}\n\n"
+                f"📞 Kisan Call Centre: 1800-180-1551\n"
+                f"உங்கள் பயிர் விரைவில் குணமாகும்! 🌿"
+            )
         return (
-            "⚠️ Disease detected on your crop.\n\n"
-            "💊 TREATMENT:\n"
-            "• Buy Mancozeb 75% WP from your local agri shop\n"
-            "• Mix 2.5 grams per 1 litre of water\n"
-            "• Spray every 7 days for 3 weeks\n\n"
-            "🛡️ PREVENTION:\n"
-            "• Remove infected leaves immediately\n"
-            "• Water only at roots, not on leaves\n\n"
+            f"⚠️ Disease detected: {disease_name}\n\n"
             "📞 Kisan Call Centre: 1800-180-1551\n"
             "உங்கள் பயிர் விரைவில் குணமாகும்! 🌿"
         )

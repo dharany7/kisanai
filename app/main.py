@@ -1,11 +1,21 @@
 """
-KisanAI — FastAPI Entry Point  (Phase 4)
+KisanAI — FastAPI Entry Point  (Phase 5 — RAG)
 Run with: uvicorn app.main:app --reload
 """
 
 import logging
 import os
+import sys
 from pathlib import Path
+
+# ---------------------------------------------------------------------------
+# Windows UTF-8 fix — emoji in print() causes UnicodeEncodeError on CP1252
+# Reconfigure stdout/stderr to UTF-8 before any other import writes to them.
+# ---------------------------------------------------------------------------
+if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+if sys.stderr and hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -30,6 +40,18 @@ app = FastAPI(
     description="WhatsApp-based AI crop advisory system for Indian smallholder farmers",
     version="1.0.0",
 )
+
+
+# ---------------------------------------------------------------------------
+# Startup: pre-load RAG knowledge base into ChromaDB
+# ---------------------------------------------------------------------------
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialise ChromaDB knowledge base when the server boots."""
+    from app.rag import initialize_knowledge_base
+    initialize_knowledge_base()
+    print("KisanAI knowledge base ready")
 
 # ---------------------------------------------------------------------------
 # CORS — allow all origins during development
